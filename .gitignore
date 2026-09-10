@@ -1,0 +1,14 @@
+# OS / editor cruft
+.DS_Store
+__MACOSX/
+*.swp
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Python
+__pycache__/
+*.pyc
+
+# Large raw/processed datasets kept out of the repo (see each project's README)
+*.csv.raw
