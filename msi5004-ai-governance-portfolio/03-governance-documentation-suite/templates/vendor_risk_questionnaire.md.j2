@@ -1,0 +1,40 @@
+# Vendor AI Risk Questionnaire: {{ system_name }}
+
+_Even for an internally-built system, this document exists so the same
+questionnaire is ready the day this capability is sourced from, or replaced by,
+a third party._
+Version {{ version }} · Owner: {{ owner }} · Last updated: {{ generated_date }}
+
+## Sourcing
+- **Vendor:** {{ vendor_name }}
+{% if vendor_name != "Internal" %}
+- **Contract / DPA reference:** {{ vendor_contract_ref }}
+{% endif %}
+
+## Questionnaire
+
+1. **What data does the vendor process, and where is it stored/processed?**
+   {{ vendor_data_handling }}
+
+2. **Can the vendor provide a model card or equivalent documentation for the
+   system supplied?**
+   {{ vendor_documentation_available }}
+
+3. **What is the vendor's incident notification commitment (time to notify us
+   of a security or model-behaviour incident)?**
+   {{ vendor_incident_notification_sla }}
+
+4. **Has the vendor's system been independently tested for bias/fairness, and
+   will they share results?**
+   {{ vendor_fairness_testing }}
+
+5. **What happens to our data if the contract ends (deletion, return, retention
+   period)?**
+   {{ vendor_offboarding_terms }}
+
+6. **Right to audit:** does the contract include a right to audit or request
+   evidence of the vendor's own governance controls?
+   {{ vendor_audit_rights }}
+
+---
+_See also: [Risk Assessment](risk_assessment.md), [Data Governance Statement](data_governance.md)._

@@ -1,0 +1,5 @@
+pandas>=2.0
+fairlearn>=0.10
+gradio>=4.44
+scikit-learn>=1.3
+datasets>=2.19

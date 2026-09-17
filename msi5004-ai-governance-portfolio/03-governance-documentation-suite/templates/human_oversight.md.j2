@@ -1,0 +1,25 @@
+# Human Oversight Design: {{ system_name }}
+
+_Model chosen from the three standard oversight patterns: human-in-the-loop
+(approve every decision), human-over-the-loop (monitor and can override),
+human-out-of-the-loop (fully autonomous, reviewed periodically)._
+Version {{ version }} · Owner: {{ owner }} · Last updated: {{ generated_date }}
+
+## Oversight Model
+**Selected pattern:** {{ oversight_model }}
+
+**Rationale:** {{ oversight_rationale }}
+
+This pattern is matched to the system's overall risk level of
+**{{ overall_risk_level }}** (see [Risk Assessment](risk_assessment.md)) — the
+higher the risk, the closer to human-in-the-loop the design should sit.
+
+## Escalation Path
+{{ escalation_path }}
+
+## Contestability
+Individuals affected by this system's outputs can challenge a decision via:
+{{ contestability_mechanism }}
+
+---
+_See also: [Risk Assessment](risk_assessment.md), [Incident Response Runbook](incident_response.md)._
