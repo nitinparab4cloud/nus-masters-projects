@@ -1,0 +1,151 @@
+# Worked example spec for the governance documentation generator.
+#
+# Model: unitary/toxic-bert (https://huggingface.co/unitary/toxic-bert), part of
+# the open-source Detoxify project, trained on the Jigsaw Toxic Comment
+# Classification Challenge dataset. Chosen because it's real, small, public,
+# and squarely a "recommender / content moderation" governance case --
+# directly continuous with the MSI5004 Week 4 material on recommender
+# systems and harmful-content amplification, and a plausible stand-in for
+# the kind of moderation tooling that sits behind any comment section or
+# chat product.
+#
+# Replace every field below with your own worked example, or duplicate this
+# file for a second one (e.g. the COMPAS-adjacent model from Case 02, for
+# maximum continuity across the three-project series).
+
+system_name: "Toxic Comment Classifier (toxic-bert)"
+version: "1.0"
+owner: "Nitin Parab (portfolio project — not affiliated with Unitary AI)"
+description: >
+  A BERT-based multi-label classifier that scores a piece of text for six
+  categories of toxicity (toxic, severe_toxic, obscene, threat, insult,
+  identity_hate), intended as a content-moderation signal for comment
+  sections or chat platforms.
+model_type: "Fine-tuned BERT-base, multi-label text classification"
+base_model: "bert-base-uncased"
+
+intended_use: >
+  Flagging candidate-toxic comments for human moderator review on a
+  moderate-traffic community platform. Output is a confidence score per
+  category, not an automatic removal decision.
+out_of_scope_uses: >
+  Fully automated content removal without human review; use as the sole
+  basis for account bans; use on languages other than English (the base
+  model and training data are English-only); use as a general sentiment
+  classifier.
+
+training_data_summary: >
+  Jigsaw Toxic Comment Classification Challenge dataset (Wikipedia talk-page
+  comments, publicly released by Jigsaw/Conversation AI via Kaggle),
+  human-labelled across six toxicity categories.
+evaluation_data_summary: >
+  Held-out split of the same Jigsaw dataset; the model card on Hugging Face
+  reports per-category ROC-AUC. Re-validate on a sample of your own
+  platform's comments before relying on these numbers -- the training
+  distribution (Wikipedia talk pages, ~2017) will not match every
+  deployment's actual comment style or period.
+performance_metrics:
+  - name: "ROC-AUC (toxic)"
+    value: "0.98 (per published model card; re-validate for your data)"
+  - name: "ROC-AUC (identity_hate)"
+    value: "0.97 (per published model card; smallest-support category -- treat with the most caution)"
+
+ethical_considerations: >
+  Toxicity classifiers trained on this kind of data are documented in the
+  literature to have disparate false-positive rates on text that mentions
+  identity terms neutrally (e.g. "I am a gay man" scoring higher than a
+  comparable neutral sentence) -- this is a known failure mode of the
+  training data, not specific to this checkpoint, and should be tested for
+  directly (see Risk Assessment) before this model gates any real action.
+caveats_recommendations: >
+  Use as a human-in-the-loop triage signal only at first deployment (see
+  Human Oversight Design). Do not fully automate removals until a
+  platform-specific fairness audit -- structured the same way as Case 02 in
+  this portfolio -- has been run against real traffic.
+
+risk_probability: "Medium"
+risk_severity: "Medium"
+affected_parties:
+  - "Platform users whose comments are scored"
+  - "Users targeted by content the system fails to catch"
+  - "Human moderators relying on the signal"
+risk_notes: >
+  Probability rated Medium: false positives/negatives are a routine,
+  expected occurrence for any moderation classifier, not a rare edge case.
+  Severity rated Medium rather than High because the current design keeps a
+  human moderator in the loop before any account-level action is taken --
+  severity would move to High if this were reconfigured for automatic
+  removal or bans without review.
+eu_ai_act_tier: "Likely outside Annex III (not squarely one of the 8 listed
+  sectors) -- but re-run this through the AI Act Risk Navigator (Case 01) if
+  scope expands, e.g. into automated account suspension, which starts to
+  resemble an access-to-essential-services or employment-adjacent use case."
+eu_ai_act_basis: "Content moderation is not itself an Annex III category as of the current text; monitor for sector-specific delegated acts."
+mitigations:
+  - "Human moderator reviews every flagged comment before removal (see Human Oversight Design)"
+  - "Confidence threshold for surfacing to moderators, not for auto-action"
+  - "Planned: identity-term false-positive audit before any expansion in scope (mirrors Case 02's methodology)"
+
+data_sources:
+  - "Jigsaw Toxic Comment Classification Challenge dataset (public, Kaggle-hosted, Wikipedia talk-page comments)"
+pii_present: true
+pii_handling_notes: >
+  Wikipedia talk-page comments may incidentally contain personal information
+  volunteered by the original commenters. No additional PII is collected by
+  this classifier itself; it processes platform comment text at inference
+  time and does not persist it beyond the moderation queue's own retention
+  policy.
+data_governance_measures:
+  - "Inference-time text is retained only as long as the platform's own moderation-queue retention policy requires"
+  - "No re-training on live platform data without a separate data governance review"
+  - "Model checkpoint version pinned and logged for every deployment"
+data_limitations: >
+  Training data is English-only, sourced from a single platform (Wikipedia)
+  and time period (~2017) -- performance on a different platform's comment
+  style, slang, or non-English text is unvalidated.
+
+oversight_model: "Human-over-the-loop"
+oversight_rationale: >
+  Matched to a Medium overall risk level: moderators are not required to
+  approve every single score, but they review every comment the model
+  surfaces above the flagging threshold, and can override or retrain the
+  threshold. This sits deliberately short of full autonomy
+  (human-out-of-the-loop) given the documented identity-term false-positive risk noted
+  in the Model Card.
+escalation_path: >
+  Flagged comment > moderation queue > human moderator decision. Comments
+  scoring in the top confidence band for "threat" are escalated to a senior
+  moderator within 1 hour regardless of queue volume.
+contestability_mechanism: >
+  A user whose comment was removed can appeal through the platform's
+  standard content-appeal form; appeals are reviewed by a moderator who did
+  not make the original removal decision.
+
+incident_severity_levels:
+  - name: "Sev 1"
+    description: "Systematic over-flagging or under-flagging affecting a large share of a protected group's comments"
+    response_time: "4 hours"
+  - name: "Sev 2"
+    description: "Isolated but harmful misclassification (e.g. a credible threat missed)"
+    response_time: "24 hours"
+  - name: "Sev 3"
+    description: "Isolated false positive with no downstream harm (comment queued, later cleared on review)"
+    response_time: "5 business days"
+incident_detection: >
+  Moderator-reported misclassifications logged in the moderation tool;
+  periodic sampling audit (see Case 02 methodology) run quarterly to catch
+  systematic drift the moderator-reporting channel would miss.
+containment_action: "Raise the flagging threshold or disable auto-surfacing for the affected category pending review."
+incident_contacts:
+  - "Trust & Safety lead"
+  - "Model owner"
+post_incident_review_threshold: "2"
+post_incident_review_window: "5 business days"
+
+vendor_name: "Internal"
+vendor_data_handling: "N/A -- internally deployed open-weight model; no vendor data-processing relationship exists for this checkpoint."
+vendor_documentation_available: "N/A"
+vendor_incident_notification_sla: "N/A"
+vendor_fairness_testing: "N/A -- see this project's own planned fairness audit instead."
+vendor_offboarding_terms: "N/A"
+vendor_audit_rights: "N/A -- this section is retained in every generated document set so it's ready the day any component of this pipeline is sourced from a vendor instead."
