@@ -1,3 +1,7 @@
+# Copyright © 2026 Nitin Parab. Part of the "AI Governance Case Files" portfolio
+# (https://github.com/nitinparab4cloud/nus-masters-projects/tree/main/msi5004-ai-governance-portfolio/04-explainability-auditor).
+# See this project's LICENSE file for reuse terms.
+
 """
 test_explainability.py
 -----------------------
