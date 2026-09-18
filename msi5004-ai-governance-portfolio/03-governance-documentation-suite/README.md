@@ -7,7 +7,7 @@ AI Risk Questionnaire — from a single YAML spec file. The deliverable isn't si
 hand-written documents; it's a **process** that regenerates them for any model.
 
 **Live demo:** _add your Hugging Face Space link here once deployed_
-**Part of:** [AI Governance Case Files](../README.md) — a three-project portfolio series
+**Part of:** [AI Governance Case Files](../README.md) — a four-project portfolio series
 **Status:** the generator is built and tested (see below); the worked example ships
 now, a second worked example and the Space UI are this project's remaining milestones.
 
@@ -18,6 +18,7 @@ now, a second worked example and the Space UI are this project's remaining miles
 ```bash
 pip install -r requirements.txt
 python generate.py specs/example_toxic_comment_classifier.yaml
+pytest test_generate.py   # regression + smoke tests for the generator itself
 ```
 
 This writes six Markdown documents to `generated/toxic-comment-classifier-toxic-bert/`,

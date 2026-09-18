@@ -20,9 +20,10 @@ counterfactual test and audit report are this project's remaining milestones (se
 
 ```bash
 pip install -r requirements.txt
-python data_loader.py       # loads + filters the dataset, prints group counts
-python fairness_metrics.py  # prints the by-group table and headline metrics
-python app.py                # launches the interactive Gradio demo locally
+python data_loader.py             # loads + filters the dataset, prints group counts
+python fairness_metrics.py        # prints the by-group table and headline metrics
+python app.py                      # launches the interactive Gradio demo locally
+pytest test_fairness_metrics.py   # regression tests, pinned to ProPublica's own published numbers
 ```
 
 The Gradio demo shows a bar chart (selection rate / true positive rate / false
