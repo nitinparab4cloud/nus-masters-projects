@@ -72,6 +72,36 @@ python app.py               # launches the Gradio demo locally
    works: new Space → SDK **Gradio** → CPU basic → push `app.py`, `risk_engine.py`,
    `test_scenarios.py`, and `requirements.txt`.
 
+## Test scenarios
+
+`test_scenarios.py` carries 10 worked examples spanning all four tiers — three
+prohibited, four high-risk, two limited-risk, one minimal-risk — used both as the
+regression suite (`python test_scenarios.py`) and as the sample dropdown in the demo.
+
+## Limitations — read before relying on this for anything real
+
+- **This is a portfolio project, not legal advice.** It is a simplified, keyword-based
+  reading of a long and actively-amended regulation. Delegated acts and guidance
+  documents continue to refine Annex III's exact scope.
+- Keyword matching produces false negatives on descriptions that don't use the
+  taxonomy's phrasing, and it can't weigh the **Article 6(3) narrow-procedural-task
+  exception**, which requires human judgment about materiality of influence on the
+  outcome — the tool flags where that exception needs to be actively assessed, but
+  doesn't decide it.
+- A production version of this would need: a broader taxonomy (synonyms, multilingual
+  input), a confidence score instead of a binary match, and a human review step before
+  any classification is relied on operationally.
+
+## Roadmap / what I'd build next
+
+- [ ] Optional LLM-assisted mode for free-text reasoning with citation-checking against
+      the retrieved article text (RAG over the Act itself), as a complement to the
+      rule-based engine rather than a replacement for it.
+- [ ] A confidence score and "closest alternative tier" output when multiple rules
+      partially match.
+- [ ] Batch mode: classify a CSV of AI system descriptions (an actual AI inventory) at
+      once.
+
 ## License
 
 MIT — see `LICENSE`.
