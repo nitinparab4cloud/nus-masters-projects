@@ -129,4 +129,4 @@ output into `index.html`'s `<script>` tag, or ask for it to be rebuilt.
 
 ## License
 
-MIT — see `LICENSE`.
+All rights reserved — see `LICENSE`. Public here for evaluation by prospective employers and collaborators; not licensed for reuse without permission.

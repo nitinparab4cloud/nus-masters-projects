@@ -142,4 +142,4 @@ predicted flag always agrees with the 0.5 probability cut. All 5 pass.
 
 ## License
 
-MIT — see `LICENSE`.
+All rights reserved — see `LICENSE`. Public here for evaluation by prospective employers and collaborators; not licensed for reuse without permission.
