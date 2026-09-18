@@ -7,7 +7,7 @@ and cross-references the result against **NIST AI RMF**'s four functions and
 **Singapore's Model AI Governance Framework**.
 
 **Live demo:** https://huggingface.co/spaces/nparab/ai-act-risk-navigator
-**Part of:** [AI Governance Case Files](../README.md) — a three-project portfolio series
+**Part of:** [AI Governance Case Files](../README.md) — a four-project portfolio series
 
 ---
 
