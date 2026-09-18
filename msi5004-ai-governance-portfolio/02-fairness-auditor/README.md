@@ -5,10 +5,8 @@ case study covered in MSI5004's Week 5 seminar — that reproduces ProPublica's 
 finding with `fairlearn`, then goes past the aggregate numbers with a counterfactual
 test on individual cases.
 
-**Live demo:** _add your Hugging Face Space link here once deployed_ (a working,
-tested, static `index.html` for a free HF Static Space ships in this folder — see
-"Deploying to Hugging Face Spaces" below; this one's ready to upload today)
-**Part of:** [AI Governance Case Files](../README.md) — a four-project portfolio series
+**Live demo:** https://huggingface.co/spaces/nparab/fairness-auditor
+**Part of:** [AI Governance Case Files](../README.md) — a five-project portfolio series
 **Status:** data pipeline and group-level metrics are built and tested, both in the
 local Gradio app (now with a bar chart) and in a browser-based static demo. The
 counterfactual test and audit report are this project's remaining milestones (see
