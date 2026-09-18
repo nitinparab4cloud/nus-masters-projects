@@ -5,11 +5,14 @@ case study covered in MSI5004's Week 5 seminar — that reproduces ProPublica's 
 finding with `fairlearn`, then goes past the aggregate numbers with a counterfactual
 test on individual cases.
 
-**Live demo:** _add your Hugging Face Space link here once deployed_
-**Part of:** [AI Governance Case Files](../README.md) — a three-project portfolio series
-**Status:** core data pipeline and group-level metrics are built and tested below;
-the counterfactual test and audit report are this project's remaining milestones
-(see `counterfactual_test.py` and the checklist in the portfolio tracker).
+**Live demo:** _add your Hugging Face Space link here once deployed_ (a working,
+tested, static `index.html` for a free HF Static Space ships in this folder — see
+"Deploying to Hugging Face Spaces" below; this one's ready to upload today)
+**Part of:** [AI Governance Case Files](../README.md) — a four-project portfolio series
+**Status:** data pipeline and group-level metrics are built and tested, both in the
+local Gradio app (now with a bar chart) and in a browser-based static demo. The
+counterfactual test and audit report are this project's remaining milestones (see
+`counterfactual_test.py` and the checklist in the portfolio tracker).
 
 ---
 
@@ -21,6 +24,10 @@ python data_loader.py       # loads + filters the dataset, prints group counts
 python fairness_metrics.py  # prints the by-group table and headline metrics
 python app.py                # launches the interactive Gradio demo locally
 ```
+
+The Gradio demo shows a bar chart (selection rate / true positive rate / false
+positive rate, grouped by the two selected races) alongside the summary text and
+table, so the gap is visible at a glance rather than only readable in a table.
 
 Running `fairness_metrics.py` against the full dataset reproduces ProPublica's
 headline finding almost exactly:
@@ -78,8 +85,27 @@ approach is scoped to ship in the Week 3 checklist item.
 
 ## Deploying to Hugging Face Spaces
 
-Same pattern as Case 01: new Space → SDK **Gradio** → CPU basic → push `app.py`,
-`data_loader.py`, `fairness_metrics.py`, and `requirements.txt`.
+Same free-tier situation as Cases 01 and 04: Hugging Face moved Gradio and Docker
+Spaces behind a paid plan, so `app.py` (the full Gradio version, now with the bar
+chart) needs a paid Space or local use. For the free route, `index.html` in this
+folder is a complete, self-contained, already-tested static demo: the filtered
+COMPAS rows (race, decile score, two-year recidivism flag — 6,172 cases) are
+embedded directly as JSON, and the metric calculations are a plain-JS port of
+`fairness_metrics.py`'s `prepare_labels` / `compute_group_metrics` /
+`compute_headline_metrics` — verified to match the Python output exactly on
+multiple group/threshold combinations (see the file's own self-test, logged to
+the browser console). It reproduces the same interaction as the Gradio app —
+pick two groups and a threshold, see selection rate / TPR / FPR update, now with
+a chart, a table, and a disparate-impact badge — entirely client-side.
+
+1. Create a new Space → SDK: **Static** → template: **Blank**.
+2. Upload `index.html` from this folder (drag-and-drop through the HF web UI
+   works fine — no git needed).
+3. Done. No build step, no server, nothing installed at runtime.
+
+If you retrain against a different dataset or add a group, regenerate the
+embedded JSON block by re-running `export_artifact.py` and re-embedding its
+output into `index.html`'s `<script>` tag, or ask for it to be rebuilt.
 
 ## Remaining milestones
 
@@ -88,7 +114,6 @@ Same pattern as Case 01: new Space → SDK **Gradio** → CPU basic → push `ap
 - [ ] Write the audit report: methodology, findings, mitigation recommendations
       (e.g. equalized-odds post-processing, or removing the feature entirely and
       re-auditing what replaces it).
-- [ ] Add a chart to the Gradio demo (see `app.py` TODO).
 - [ ] Publish the repo and the report.
 
 ## Limitations
