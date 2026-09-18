@@ -104,4 +104,4 @@ regression suite (`python test_scenarios.py`) and as the sample dropdown in the 
 
 ## License
 
-MIT — see `LICENSE`.
+All rights reserved — see `LICENSE`. Public here for evaluation by prospective employers and collaborators; not licensed for reuse without permission.

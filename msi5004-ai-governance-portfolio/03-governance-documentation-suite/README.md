@@ -96,4 +96,4 @@ instead of hand-editing YAML. New Space → SDK **Gradio** → CPU basic.
 
 ## License
 
-MIT — see `LICENSE`.
+All rights reserved — see `LICENSE`. Public here for evaluation by prospective employers and collaborators; not licensed for reuse without permission.

@@ -172,4 +172,4 @@ All 50 tests pass.
 
 ## License
 
-MIT — see `LICENSE`.
+All rights reserved — see `LICENSE`. Public here for evaluation by prospective employers and collaborators; not licensed for reuse without permission.
