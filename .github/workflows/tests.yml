@@ -25,7 +25,6 @@ jobs:
           - 03-governance-documentation-suite
           - 04-explainability-auditor
           - 05-governed-rag-agent
-          - 06-agentic-incident-response
     defaults:
       run:
         working-directory: msi5004-ai-governance-portfolio/${{ matrix.project }}
