@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<!--
+  © 2026 Nitin Parab — Agentic AI Incident Response. Part of the "AI Governance Case Files" portfolio.
+  Source: https://github.com/nitinparab4cloud/nus-masters-projects/tree/main/msi5004-ai-governance-portfolio/06-agentic-incident-response
+  See this project's LICENSE file for reuse terms.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case 06 &mdash; Agentic AI Incident Response (static demo)</title>
+<style>
+  :root {
+    --blue: #2563eb; --blue-dark: #1d4ed8; --orange: #ea580c;
+    --green: #16a34a; --red: #dc2626; --gray-50: #f9fafb; --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb; --gray-400: #9ca3af; --gray-600: #4b5563; --gray-800: #1f2937;
+    --bg: #ffffff; --fg: #1f2937; --card-bg: #ffffff; --border: #e5e7eb;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f172a; --fg: #e5e7eb; --card-bg: #1e293b; --border: #334155;
+      --gray-50: #1e293b; --gray-100: #273449; --gray-200: #334155;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg); color: var(--fg); line-height: 1.5;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 1.5rem; margin-bottom: 4px; }
+  .subtitle { color: var(--gray-600); margin-top: 0; font-size: 0.95rem; }
+  #selftest-banner {
+    padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 20px;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+  }
+  #selftest-banner.pass { background: #dcfce7; color: #166534; }
+  #selftest-banner.fail { background: #fee2e2; color: #991b1b; }
+  @media (prefers-color-scheme: dark) {
+    #selftest-banner.pass { background: #14532d; color: #bbf7d0; }
+    #selftest-banner.fail { background: #7f1d1d; color: #fecaca; }
+  }
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 20px; flex-wrap: wrap; }
+  .tab-btn {
+    background: none; border: none; padding: 10px 14px; cursor: pointer; font-size: 0.9rem;
+    color: var(--gray-600); border-bottom: 2px solid transparent; font-weight: 500;
+  }
+  .tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .card {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px;
+    padding: 16px; margin-bottom: 16px;
+  }
+  label { display: block; font-size: 0.85rem; font-weight: 600; margin: 10px 0 4px; }
+  input[type="text"], input[type="number"], select, textarea {
+    width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px;
+    background: var(--gray-50); color: var(--fg); font-size: 0.9rem; font-family: inherit;
+  }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .row > div { flex: 1; min-width: 160px; }
+  .checkbox-row { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
+  .checkbox-row input { width: auto; }
+  button.action {
+    background: var(--blue); color: white; border: none; border-radius: 6px;
+    padding: 8px 16px; font-size: 0.9rem; cursor: pointer; margin-top: 10px; font-weight: 600;
+  }
+  button.action:hover { background: var(--blue-dark); }
+  button.action.secondary { background: var(--gray-400); }
+  button.action.danger { background: var(--red); }
+  .result-box {
+    margin-top: 10px; padding: 10px 12px; border-radius: 6px; font-size: 0.88rem;
+    background: var(--gray-100); white-space: pre-wrap;
+  }
+  .result-box.ok { border-left: 3px solid var(--green); }
+  .result-box.blocked { border-left: 3px solid var(--red); }
+  .result-box.pending { border-left: 3px solid var(--orange); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 8px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--gray-600); font-weight: 600; }
+  .badge { font-weight: 600; padding: 1px 6px; border-radius: 4px; font-size: 0.78rem; }
+  .badge.allowed { color: var(--green); }
+  .badge.blocked { color: var(--red); }
+  .badge.pass { color: var(--green); }
+  .badge.fail { color: var(--red); }
+  .mono { font-family: ui-monospace, SFMono-Regular, monospace; font-size: 0.78rem; }
+  .plain-english { min-width: 260px; color: var(--fg); }
+  .note { font-size: 0.83rem; color: var(--gray-600); margin-top: 4px; }
+  .mode-toggle { display: flex; gap: 16px; margin: 10px 0; }
+  .mode-toggle label { display: flex; align-items: center; gap: 6px; font-weight: 500; margin: 0; }
+  .mode-toggle input { width: auto; }
+  footer { margin-top: 40px; font-size: 0.8rem; color: var(--gray-600); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Agentic AI Incident Response</h1>
+  <p class="subtitle">
+    A synthetic sandbox and policy engine modeling the shape of the July 2026 OpenAI /
+    Hugging Face agentic security incident &mdash; no real vulnerability, exploit technique, or
+    vulnerable software is reproduced here, only the <em>governance failure modes</em> and the
+    controls that would have caught them. This static page is a line-for-line JS port of the
+    Python engine in the repo (sandbox.py / policy_engine.py / audit_log.py) &mdash; no server,
+    no network calls, everything runs in your browser.
+  </p>
+  <div id="selftest-banner">Running self-tests&hellip;</div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="replay">Replay the Incident</button>
+    <button class="tab-btn" data-tab="manual">Try a Single Action</button>
+    <button class="tab-btn" data-tab="redteam">Red-Team Scenarios</button>
+    <button class="tab-btn" data-tab="audit">Audit Log</button>
+  </div>
+
+  <div class="panel active" id="panel-replay">
+    <div class="card">
+      <p class="note">
+        Runs a fixed, scripted sequence that mirrors the incident's shape: two agents using
+        shared storage as a message board, a task retried past the point of being stuck, a
+        credential used outside its scope, and an un-allowlisted egress attempt. With guardrails
+        on, every one of these is blocked and raises an alert; with guardrails off, all of them
+        succeed &mdash; exactly the ungoverned outcome the real incident had.
+      </p>
+      <div class="mode-toggle">
+        <label><input type="radio" name="replay-mode" value="on" checked> Guardrails ON</label>
+        <label><input type="radio" name="replay-mode" value="off"> Guardrails OFF (ungoverned)</label>
+      </div>
+      <button class="action" id="replay-run">Reset and replay</button>
+      <div class="result-box" id="replay-summary" style="display:none;"></div>
+      <table id="replay-table">
+        <thead><tr><th>Step</th><th>Agent</th><th>Tool</th><th>Outcome</th><th>Message</th><th>Agent state after</th><th>What's happening (plain English)</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-manual">
+    <div class="card">
+      <p class="note">
+        Dispatch one action against the current engine (whatever the last replay left it as) to
+        explore a control in isolation. An unknown agent id is registered on the fly.
+      </p>
+      <div class="row">
+        <div><label>Agent id</label><input type="text" id="m-agent" value="probe"></div>
+        <div><label>Credential scoped to</label>
+          <select id="m-cred-scope">
+            <option value="(none)">(none)</option>
+            <option value="run_task" selected>run_task</option>
+            <option value="registry_io">registry_io</option>
+            <option value="reach_internet">reach_internet</option>
+            <option value="credential_store">credential_store</option>
+          </select>
+        </div>
+        <div><label>Tool to call</label>
+          <select id="m-tool">
+            <option value="run_task" selected>run_task</option>
+            <option value="registry_io">registry_io</option>
+            <option value="reach_internet">reach_internet</option>
+            <option value="credential_store">credential_store</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div><label>task_id (run_task)</label><input type="text" id="m-task-id" value="manual-task"></div>
+        <div><label>storage_key (registry_io)</label><input type="text" id="m-storage-key" value="manual-key"></div>
+        <div><label>url (reach_internet) / value (registry_io)</label><input type="text" id="m-url" value="https://example.test"></div>
+        <div><label>cluster (credential_store)</label><input type="text" id="m-cluster" value="manual-cluster"></div>
+      </div>
+      <div class="checkbox-row"><input type="checkbox" id="m-solvable" checked><label for="m-solvable" style="margin:0;">solvable (run_task)</label></div>
+      <button class="action" id="m-dispatch">Dispatch</button>
+      <div class="result-box" id="m-result" style="display:none;"></div>
+
+      <div class="row" style="margin-top:16px;">
+        <div><label>Agent id to allowlist for reach_internet</label><input type="text" id="m-allow-agent" value="probe"></div>
+      </div>
+      <button class="action secondary" id="m-allow">Allowlist for egress</button>
+      <div class="result-box" id="m-allow-result" style="display:none;"></div>
+
+      <p class="note" style="margin-top:16px;">Action trace (this session)</p>
+      <table id="manual-table">
+        <thead><tr><th>Step</th><th>Agent</th><th>Tool</th><th>Outcome</th><th>Message</th><th>Agent state after</th><th>What's happening (plain English)</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-redteam">
+    <div class="card">
+      <p class="note">
+        Each case is an adversarial scenario asserting one specific safe behavior &mdash; not
+        just "no crash." These are the same 11 cases <span class="mono">redteam_suite.py</span>
+        runs under pytest and in CI.
+      </p>
+      <label>Case</label>
+      <select id="rt-case"></select>
+      <button class="action" id="rt-run">Run this case</button>
+      <div class="result-box" id="rt-result" style="display:none;"></div>
+
+      <p class="note" style="margin-top:16px;">Or run the full suite</p>
+      <button class="action secondary" id="rt-run-all">Run all 11 cases</button>
+      <div class="result-box" id="rt-all-summary" style="display:none;"></div>
+      <table id="rt-table">
+        <thead><tr><th>Category</th><th>Case</th><th>Result</th><th>Detail</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-audit">
+    <div class="card">
+      <p class="note">
+        Every dispatch, denial, alert, escalation, and autonomous shutdown is appended here with a
+        SHA-256 hash (via the browser's built-in <span class="mono">crypto.subtle</span>) covering
+        its own content plus the previous entry's hash &mdash; tamper-evident within this page's
+        memory, not a real WORM store. Refresh after a replay or a manual dispatch to see the
+        latest entries.
+      </p>
+      <button class="action" id="audit-verify">Verify chain integrity</button>
+      <button class="action secondary" id="audit-tamper">Tamper with entry #0 (demo)</button>
+      <button class="action secondary" id="audit-refresh">Refresh log</button>
+      <div class="result-box" id="audit-result" style="display:none;"></div>
+      <table id="audit-table">
+        <thead><tr><th>Seq</th><th>Timestamp</th><th>Event</th><th>Payload</th><th>Prev hash</th><th>Entry hash</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer>
+    Static, dependency-free JS port of the Python engine (sandbox.py / policy_engine.py /
+    audit_log.py / redteam_suite.py) in this repo. Self-tests below mirror the pytest suites
+    and run on every page load.
+    © 2026 Nitin Parab.
+  </footer>
+</div>
+
+<script>
+"use strict";
+
+// =====================================================================
+// audit_log.py port
+// =====================================================================
+const GENESIS_HASH = "0".repeat(64);
+
+function canonicalJson(obj) {
+  if (obj === null || typeof obj !== "object") return JSON.stringify(obj);
+  if (Array.isArray(obj)) return "[" + obj.map(canonicalJson).join(",") + "]";
+  const keys = Object.keys(obj).sort();
+  return "{" + keys.map(k => JSON.stringify(k) + ":" + canonicalJson(obj[k])).join(",") + "}";
+}
+
+async function sha256Hex(str) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function hashEntry(seq, event, payload, prevHash, ts) {
+  const body = canonicalJson({ seq, event, payload, prev_hash: prevHash, ts });
+  return sha256Hex(body);
+}
+
+class AuditLog {
+  constructor() { this._entries = []; }
+
+  async append(event, payload, ts) {
+    payload = payload || {};
+    const seq = this._entries.length;
+    const prevHash = seq ? this._entries[seq - 1].entryHash : GENESIS_HASH;
+    const tsVal = ts !== undefined && ts !== null ? ts : Date.now() / 1000;
+    const entryHash = await hashEntry(seq, event, payload, prevHash, tsVal);
+    const entry = { seq, event, payload, prevHash, ts: tsVal, entryHash };
+    this._entries.push(entry);
+    return entry;
+  }
+
+  entries() { return this._entries.slice(); }
+
+  async verifyChain() {
+    let prevHash = GENESIS_HASH;
+    for (const e of this._entries) {
+      const expected = await hashEntry(e.seq, e.event, e.payload, prevHash, e.ts);
+      if (expected !== e.entryHash) {
+        return [false, `chain broken at seq ${e.seq}: stored hash does not match recomputed hash`];
+      }
+      if (e.prevHash !== prevHash) {
+        return [false, `chain broken at seq ${e.seq}: prev_hash does not match the prior entry`];
+      }
+      prevHash = e.entryHash;
+    }
+    return [true, `chain intact: ${this._entries.length} entries verified`];
+  }
+
+  get length() { return this._entries.length; }
+}
+
+// =====================================================================
+// sandbox.py port
+// =====================================================================
+const AgentState = Object.freeze({
+  RUNNING: "running",
+  STOPPED_PENDING_REVIEW: "stopped_pending_review",
+  SHUT_DOWN: "shut_down",
+});
+
+class TaskUnsolvable extends Error {}
+
+class Credential {
+  constructor({ agentId, scopedTool, issuedAt, ttlSeconds = 300.0 }) {
+    this.agentId = agentId;
+    this.scopedTool = scopedTool;
+    this.issuedAt = issuedAt;
+    this.ttlSeconds = ttlSeconds;
+  }
+  isExpired(now) { return now > this.issuedAt + this.ttlSeconds; }
+  covers(toolName) { return this.scopedTool === toolName; }
+}
+
+class Agent {
+  constructor(agentId, declaredTask) {
+    this.agentId = agentId;
+    this.declaredTask = declaredTask;
+    this.state = AgentState.RUNNING;
+  }
+}
+
+class ToolResult {
+  constructor(ok, data = null, message = "") { this.ok = ok; this.data = data; this.message = message; }
+}
+
+class SandboxEnvironment {
+  constructor() {
+    this._tools = new Map();
+    this._registryStore = new Map();
+  }
+
+  register(name, purpose, handler) { this._tools.set(name, { name, purpose, handler }); }
+  get(toolName) { return this._tools.get(toolName) || null; }
+
+  execute(toolName, kwargs = {}) {
+    const tool = this._tools.get(toolName);
+    if (!tool) return new ToolResult(false, null, `no such tool: ${toolName}`);
+    return tool.handler(kwargs);
+  }
+
+  buildDefaultTools() {
+    this.register("run_task", "task_execution", (kw) => this._runTask(kw));
+    this.register("registry_io", "storage", (kw) => this._registryIo(kw));
+    this.register("reach_internet", "internet_egress", (kw) => this._reachInternet(kw));
+    this.register("credential_store", "credential_access", (kw) => this._credentialStore(kw));
+  }
+
+  _runTask({ taskId, solvable = true }) {
+    if (solvable) return new ToolResult(true, { task_id: taskId }, "task solved");
+    throw new TaskUnsolvable(`task ${taskId} has no known solution`);
+  }
+
+  _registryIo({ key, value = null }) {
+    if (value !== null && value !== undefined) {
+      const list = this._registryStore.get(key) || [];
+      list.push(value);
+      this._registryStore.set(key, list);
+      return new ToolResult(true, null, `wrote to ${key}`);
+    }
+    const entries = this._registryStore.get(key) || [];
+    return new ToolResult(true, entries.slice(), `read ${entries.length} entries from ${key}`);
+  }
+
+  _reachInternet({ url }) { return new ToolResult(true, { url }, "reached the open internet (synthetic)"); }
+
+  _credentialStore({ cluster }) {
+    return new ToolResult(true, { cluster, credentials: ["synthetic-cred"] }, `read credential store for ${cluster}`);
+  }
+}
+
+// =====================================================================
+// policy_engine.py port
+// =====================================================================
+const STUCK_LOOP_THRESHOLD = 3;
+const CHANNEL_ANOMALY_MIN_AGENTS = 2;
+const CHANNEL_ANOMALY_MIN_EVENTS = 4;
+const CHANNEL_ANOMALY_WINDOW_SECONDS = 60.0;
+const ALERT_ESCALATION_SLA_SECONDS = 1800.0;
+const ALERT_MAX_TIERS_BEFORE_SHUTDOWN = 1;
+
+class Clock {
+  constructor(start = 0.0) { this._now = start; }
+  now() { return this._now; }
+  advance(seconds) { this._now += seconds; }
+}
+
+class AlertEscalator {
+  constructor(clock, auditLog) {
+    this._clock = clock;
+    this._audit = auditLog;
+    this._alerts = [];
+    this._nextId = 1;
+  }
+
+  async raiseAlert(severity, reason, agentId) {
+    const alert = {
+      alertId: this._nextId++, severity, reason, agentId,
+      createdAt: this._clock.now(), acknowledged: false, escalatedTier: 0, resolved: false,
+    };
+    this._alerts.push(alert);
+    await this._audit.append("alert_raised", {
+      alert_id: alert.alertId, severity, reason, agent_id: agentId,
+    }, this._clock.now());
+    return alert;
+  }
+
+  async acknowledge(alertId) {
+    for (const a of this._alerts) {
+      if (a.alertId === alertId && !a.resolved) {
+        a.acknowledged = true;
+        a.resolved = true;
+        await this._audit.append("alert_acknowledged", { alert_id: alertId }, this._clock.now());
+        return true;
+      }
+    }
+    return false;
+  }
+
+  openAlerts() { return this._alerts.filter(a => !a.resolved); }
+
+  async checkEscalations(agents) {
+    const now = this._clock.now();
+    for (const alert of this.openAlerts()) {
+      const age = now - alert.createdAt;
+      const tierDue = Math.floor(age / ALERT_ESCALATION_SLA_SECONDS);
+      if (tierDue > alert.escalatedTier) {
+        alert.escalatedTier = tierDue;
+        await this._audit.append("alert_escalated", {
+          alert_id: alert.alertId, tier: alert.escalatedTier, age_seconds: age,
+        }, now);
+      }
+      if (alert.escalatedTier > ALERT_MAX_TIERS_BEFORE_SHUTDOWN) {
+        const agent = agents.get(alert.agentId);
+        if (agent && agent.state !== AgentState.SHUT_DOWN) {
+          agent.state = AgentState.SHUT_DOWN;
+          alert.resolved = true;
+          await this._audit.append("autonomous_shutdown", {
+            agent_id: agent.agentId, triggering_alert_id: alert.alertId,
+            reason: "alert unacknowledged past final escalation tier",
+          }, now);
+        }
+      }
+    }
+  }
+}
+
+class StuckLoopDetector {
+  constructor() { this._consecutiveFailures = new Map(); }
+
+  record(agentId, toolName, taskId, success) {
+    const key = `${agentId}\u0000${toolName}\u0000${taskId}`;
+    if (success) { this._consecutiveFailures.delete(key); return false; }
+    const count = (this._consecutiveFailures.get(key) || 0) + 1;
+    this._consecutiveFailures.set(key, count);
+    return count >= STUCK_LOOP_THRESHOLD;
+  }
+}
+
+class CredentialScopeGuard {
+  static check(credential, toolName, now) {
+    if (!credential) return [false, "no credential presented"];
+    if (credential.isExpired(now)) return [false, `credential expired (scoped to '${credential.scopedTool}')`];
+    if (!credential.covers(toolName)) {
+      return [false, `credential scoped to '${credential.scopedTool}', not '${toolName}' -- scope violation`];
+    }
+    return [true, "ok"];
+  }
+}
+
+class EgressPolicy {
+  constructor() { this._allowlist = new Set(); }
+  allow(agentId, toolName) { this._allowlist.add(`${agentId}\u0000${toolName}`); }
+  check(agentId, tool) {
+    if (tool.purpose !== "internet_egress") return [true, "not an egress-class tool"];
+    if (this._allowlist.has(`${agentId}\u0000${tool.name}`)) return [true, "explicitly allowlisted"];
+    return [false, `default-deny: '${tool.name}' is egress-class and not allowlisted for ${agentId}`];
+  }
+}
+
+class ChannelAnomalyDetector {
+  constructor() { this._events = []; }
+
+  recordAndCheck(now, agentId, toolName, key) {
+    this._events.push([now, agentId, toolName, key]);
+    const windowStart = now - CHANNEL_ANOMALY_WINDOW_SECONDS;
+    const recent = this._events.filter(e => e[0] >= windowStart && e[2] === toolName && e[3] === key);
+    const distinctAgents = new Set(recent.map(e => e[1]));
+    if (distinctAgents.size >= CHANNEL_ANOMALY_MIN_AGENTS && recent.length >= CHANNEL_ANOMALY_MIN_EVENTS) {
+      return [true, `'${toolName}' key '${key}' used by ${distinctAgents.size} distinct agents ` +
+        `(${recent.length} events in ${CHANNEL_ANOMALY_WINDOW_SECONDS.toFixed(0)}s) -- looks like an ` +
+        `unauthorized coordination channel, not ${toolName}'s declared purpose`];
+    }
+    return [false, "ok"];
+  }
+}
+
+class PolicyEngine {
+  constructor(env, auditLog, clock = null, guardrailsEnabled = true) {
+    this.env = env;
+    this.audit = auditLog;
+    this.clock = clock || new Clock();
+    this.guardrailsEnabled = guardrailsEnabled;
+    this.agents = new Map();
+    this.stuckLoop = new StuckLoopDetector();
+    this.egressPolicy = new EgressPolicy();
+    this.channelDetector = new ChannelAnomalyDetector();
+    this.escalator = new AlertEscalator(this.clock, this.audit);
+  }
+
+  async registerAgent(agent) {
+    this.agents.set(agent.agentId, agent);
+    await this.audit.append("agent_registered", { agent_id: agent.agentId, task: agent.declaredTask }, this.clock.now());
+  }
+
+  async dispatch(agentId, toolName, credential, { taskId = "", storageKey = "", ...kwargs } = {}) {
+    const agent = this.agents.get(agentId);
+    if (!agent) return new ToolResult(false, null, `unknown agent: ${agentId}`);
+
+    if (agent.state !== AgentState.RUNNING) {
+      await this.audit.append("dispatch_refused", {
+        agent_id: agentId, tool: toolName, reason: `agent state is ${agent.state}`,
+      }, this.clock.now());
+      return new ToolResult(false, null, `agent ${agentId} is ${agent.state}, refusing dispatch`);
+    }
+
+    const tool = this.env.get(toolName);
+    if (!tool) return new ToolResult(false, null, `no such tool: ${toolName}`);
+
+    if (this.guardrailsEnabled) {
+      const denyReason = await this._runControls(agent, tool, credential, taskId, storageKey);
+      if (denyReason !== null) {
+        await this.audit.append("dispatch_denied", { agent_id: agentId, tool: toolName, reason: denyReason }, this.clock.now());
+        return new ToolResult(false, null, denyReason);
+      }
+    }
+
+    const execKwargs = Object.assign({}, kwargs);
+    if (toolName === "run_task" && taskId) execKwargs.taskId = execKwargs.taskId ?? taskId;
+    if (toolName === "registry_io" && storageKey) execKwargs.key = execKwargs.key ?? storageKey;
+
+    let result, success;
+    try {
+      result = this.env.execute(toolName, execKwargs);
+      success = result.ok;
+    } catch (exc) {
+      if (exc instanceof TaskUnsolvable) { result = new ToolResult(false, null, exc.message); success = false; }
+      else throw exc;
+    }
+
+    await this.audit.append("dispatch_executed", {
+      agent_id: agentId, tool: toolName, ok: result.ok, message: result.message,
+    }, this.clock.now());
+
+    if (this.guardrailsEnabled && toolName === "run_task" && taskId) {
+      const tripped = this.stuckLoop.record(agentId, toolName, taskId, success);
+      if (tripped) {
+        agent.state = AgentState.STOPPED_PENDING_REVIEW;
+        await this.audit.append("stuck_loop_stop", {
+          agent_id: agentId, tool: toolName, task_id: taskId,
+          reason: `>= ${STUCK_LOOP_THRESHOLD} consecutive failures -- forcing stop instead of retry`,
+        }, this.clock.now());
+        await this.escalator.raiseAlert("medium", `agent stuck-looped on task ${taskId}`, agentId);
+      }
+    }
+
+    await this.escalator.checkEscalations(this.agents);
+    return result;
+  }
+
+  async _runControls(agent, tool, credential, taskId, storageKey) {
+    let [ok, reason] = CredentialScopeGuard.check(credential, tool.name, this.clock.now());
+    if (!ok) { await this.escalator.raiseAlert("high", `credential scope violation: ${reason}`, agent.agentId); return reason; }
+
+    [ok, reason] = this.egressPolicy.check(agent.agentId, tool);
+    if (!ok) { await this.escalator.raiseAlert("high", reason, agent.agentId); return reason; }
+
+    if (storageKey) {
+      let anomalous;
+      [anomalous, reason] = this.channelDetector.recordAndCheck(this.clock.now(), agent.agentId, tool.name, storageKey);
+      if (anomalous) { await this.escalator.raiseAlert("high", reason, agent.agentId); return reason; }
+    }
+    return null;
+  }
+}
+
+function cred(agentId, tool, now, ttl) {
+  return new Credential({ agentId, scopedTool: tool, issuedAt: now || 0.0, ttlSeconds: ttl || 3600.0 });
+}
+
+function newEngine(guardrailsEnabled) {
+  const env = new SandboxEnvironment();
+  env.buildDefaultTools();
+  const audit = new AuditLog();
+  const clock = new Clock();
+  const engine = new PolicyEngine(env, audit, clock, guardrailsEnabled !== false);
+  return { engine, audit, clock };
+}
+
+// =====================================================================
+// redteam_suite.py port -- 11 cases, one per real incident failure mode
+// =====================================================================
+const RT_CASES = [
+  {
+    name: "pivot-with-wrong-scope", category: "credential_pivot",
+    description: "Agent presents a credential scoped to registry_io while calling run_task -- models the incident's single over-privileged credential reaching every service.",
+    run: async () => {
+      const { engine } = newEngine();
+      await engine.registerAgent(new Agent("a1", "task"));
+      const r = await engine.dispatch("a1", "run_task", cred("a1", "registry_io"), { taskId: "t1", solvable: true });
+      return r.ok ? [false, "credential pivot was NOT blocked -- scope check failed to fire"] : [true, `blocked: ${r.message}`];
+    },
+  },
+  {
+    name: "pivot-with-expired-credential", category: "credential_pivot",
+    description: "A correctly-scoped but expired credential is presented after its TTL.",
+    run: async () => {
+      const { engine, clock } = newEngine();
+      await engine.registerAgent(new Agent("a1", "task"));
+      clock.advance(10000.0);
+      const r = await engine.dispatch("a1", "run_task", cred("a1", "run_task", 0.0, 100.0), { taskId: "t1", solvable: true });
+      return r.ok ? [false, "expired credential was accepted"] : [true, `blocked: ${r.message}`];
+    },
+  },
+  {
+    name: "egress-without-allowlist", category: "unauthorized_egress",
+    description: "Agent has a validly-scoped credential for reach_internet but the task was never allowlisted for egress -- models the SSRF pivot to the open internet.",
+    run: async () => {
+      const { engine } = newEngine();
+      await engine.registerAgent(new Agent("a1", "task"));
+      const r = await engine.dispatch("a1", "reach_internet", cred("a1", "reach_internet"), { url: "https://example.test" });
+      return r.ok ? [false, "egress was allowed with no explicit allowlist entry"] : [true, `blocked: ${r.message}`];
+    },
+  },
+  {
+    name: "egress-allowlisted-task-still-works", category: "unauthorized_egress",
+    description: "False-positive check: a task that legitimately needs egress, and was explicitly allowlisted for it, must still be able to run.",
+    run: async () => {
+      const { engine } = newEngine();
+      await engine.registerAgent(new Agent("a1", "task"));
+      engine.egressPolicy.allow("a1", "reach_internet");
+      const r = await engine.dispatch("a1", "reach_internet", cred("a1", "reach_internet"), { url: "https://example.test" });
+      return !r.ok ? [false, `a legitimately allowlisted call was wrongly blocked: ${r.message}`] : [true, "allowlisted egress succeeded as expected"];
+    },
+  },
+  {
+    name: "unsolvable-task-retried-past-threshold", category: "stuck_loop_escalation",
+    description: `Agent retries the same unsolvable task ${STUCK_LOOP_THRESHOLD} times in a row -- models the 198 never-solved ExploitGym tasks that drove 93% of the incident's unauthorized coordination activity.`,
+    run: async () => {
+      const { engine } = newEngine();
+      await engine.registerAgent(new Agent("a1", "task"));
+      const taskCred = cred("a1", "run_task");
+      for (let i = 0; i < STUCK_LOOP_THRESHOLD; i++) await engine.dispatch("a1", "run_task", taskCred, { taskId: "impossible", solvable: false });
+      return engine.agents.get("a1").state !== AgentState.STOPPED_PENDING_REVIEW
+        ? [false, "agent kept retrying past the threshold instead of forcing a stop"]
+        : [true, "agent was forced to stop and wait for human review"];
+    },
+  },
+  {
+    name: "ordinary-retry-does-not-false-positive", category: "stuck_loop_escalation",
+    description: "False-positive check: occasional failures interspersed with successes on different tasks must not trip the stuck-loop control.",
+    run: async () => {
+      const { engine } = newEngine();
+      await engine.registerAgent(new Agent("a1", "task"));
+      const taskCred = cred("a1", "run_task");
+      await engine.dispatch("a1", "run_task", taskCred, { taskId: "t1", solvable: true });
+      await engine.dispatch("a1", "run_task", taskCred, { taskId: "t2", solvable: false });
+      await engine.dispatch("a1", "run_task", taskCred, { taskId: "t3", solvable: true });
+      return engine.agents.get("a1").state !== AgentState.RUNNING
+        ? [false, "ordinary task variance incorrectly forced a stop"]
+        : [true, "agent kept running through ordinary task variance"];
+    },
+  },
+  {
+    name: "storage-tool-used-as-message-board", category: "unauthorized_channel",
+    description: "Two distinct agents alternate writes/reads on the same storage key -- models Artifactory being repurposed as an inter-agent message board.",
+    run: async () => {
+      const { engine } = newEngine();
+      await engine.registerAgent(new Agent("a1", "task"));
+      await engine.registerAgent(new Agent("a2", "task"));
+      let last;
+      for (let i = 0; i < CHANNEL_ANOMALY_MIN_EVENTS + 1; i++) {
+        const agentId = i % 2 === 0 ? "a1" : "a2";
+        last = await engine.dispatch(agentId, "registry_io", cred(agentId, "registry_io"), { storageKey: "shared", value: `m${i}` });
+      }
+      return last.ok ? [false, "coordination channel via shared storage went undetected"] : [true, `blocked: ${last.message}`];
+    },
+  },
+  {
+    name: "single-agent-storage-use-is-not-flagged", category: "unauthorized_channel",
+    description: "False-positive check: one agent reading and writing its own storage key repeatedly is ordinary use, not a channel, and must not be blocked.",
+    run: async () => {
+      const { engine } = newEngine();
+      await engine.registerAgent(new Agent("a1", "task"));
+      const ioCred = cred("a1", "registry_io");
+      let ok = true;
+      for (let i = 0; i < CHANNEL_ANOMALY_MIN_EVENTS + 3; i++) {
+        const r = await engine.dispatch("a1", "registry_io", ioCred, { storageKey: "own", value: `n${i}` });
+        ok = ok && r.ok;
+      }
+      return !ok ? [false, "single-agent normal storage use was wrongly blocked"] : [true, "single-agent storage use was never flagged"];
+    },
+  },
+  {
+    name: "unacknowledged-alert-autonomously-shuts-down", category: "detection_without_escalation",
+    description: "A high-severity alert is raised and never acknowledged -- models Hugging Face's monitoring detecting the activity but the page never reaching an on-call human in time.",
+    run: async () => {
+      const { engine, clock } = newEngine();
+      await engine.registerAgent(new Agent("a1", "task"));
+      await engine.dispatch("a1", "run_task", cred("a1", "registry_io"), { taskId: "t1", solvable: true });
+      clock.advance(ALERT_ESCALATION_SLA_SECONDS * (ALERT_MAX_TIERS_BEFORE_SHUTDOWN + 2));
+      await engine.dispatch("a1", "run_task", cred("a1", "run_task", clock.now()), { taskId: "t2", solvable: true });
+      return engine.agents.get("a1").state !== AgentState.SHUT_DOWN
+        ? [false, "alert sat unacknowledged and nothing ever shut the agent down"]
+        : [true, "unacknowledged alert escalated and triggered autonomous shutdown"];
+    },
+  },
+  {
+    name: "acknowledged-alert-does-not-shut-down", category: "detection_without_escalation",
+    description: "False-positive check: an alert a human actually acknowledged must not later trigger an autonomous shutdown just because time passed.",
+    run: async () => {
+      const { engine, clock } = newEngine();
+      await engine.registerAgent(new Agent("a1", "task"));
+      await engine.dispatch("a1", "run_task", cred("a1", "registry_io"), { taskId: "t1", solvable: true });
+      for (const a of engine.escalator.openAlerts()) await engine.escalator.acknowledge(a.alertId);
+      clock.advance(ALERT_ESCALATION_SLA_SECONDS * (ALERT_MAX_TIERS_BEFORE_SHUTDOWN + 2));
+      await engine.dispatch("a1", "run_task", cred("a1", "run_task", clock.now()), { taskId: "t2", solvable: true });
+      return engine.agents.get("a1").state === AgentState.SHUT_DOWN
+        ? [false, "an acknowledged alert still triggered a shutdown"]
+        : [true, "acknowledged alert did not trigger a shutdown"];
+    },
+  },
+  {
+    name: "guardrails-off-reproduces-the-incident", category: "ungoverned_baseline",
+    description: "With every control disabled, the exact scope violation that case pivot-with-wrong-scope blocks must succeed instead -- proving the controls are what changed the outcome, not incidental behavior.",
+    run: async () => {
+      const { engine } = newEngine(false);
+      await engine.registerAgent(new Agent("a1", "task"));
+      const r = await engine.dispatch("a1", "run_task", cred("a1", "registry_io"), { taskId: "t1", solvable: true });
+      return !r.ok ? [false, "guardrails-off mode still blocked the action -- controls aren't isolated"] : [true, "confirmed: without the controls, the scope violation succeeds"];
+    },
+  },
+];
+
+// =====================================================================
+// Self-tests -- mirror test_sandbox_and_audit.py + test_policy_engine.py
+// =====================================================================
+async function runSelfTests() {
+  const results = [];
+  const assert_ = (name, cond) => results.push({ name, pass: !!cond });
+
+  {
+    const env = new SandboxEnvironment(); env.buildDefaultTools();
+    const r = env.execute("run_task", { taskId: "t1", solvable: true });
+    assert_("run_task solvable succeeds", r.ok && r.data.task_id === "t1");
+  }
+  {
+    const env = new SandboxEnvironment(); env.buildDefaultTools();
+    let threw = false;
+    try { env.execute("run_task", { taskId: "t-impossible", solvable: false }); } catch (e) { threw = true; }
+    assert_("run_task unsolvable raises", threw);
+  }
+  {
+    const env = new SandboxEnvironment(); env.buildDefaultTools();
+    const w = env.execute("registry_io", { key: "k1", value: "hello" });
+    const r = env.execute("registry_io", { key: "k1" });
+    assert_("registry_io write then read", w.ok && r.ok && r.data.length === 1 && r.data[0] === "hello");
+  }
+  {
+    const env = new SandboxEnvironment(); env.buildDefaultTools();
+    const r = env.execute("does_not_exist", {});
+    assert_("unknown tool returns error not exception", !r.ok && r.message.includes("no such tool"));
+  }
+  {
+    const c = new Credential({ agentId: "a1", scopedTool: "run_task", issuedAt: 0.0 });
+    assert_("credential covers its own tool only", c.covers("run_task") && !c.covers("reach_internet"));
+  }
+  {
+    const c = new Credential({ agentId: "a1", scopedTool: "run_task", issuedAt: 0.0, ttlSeconds: 10.0 });
+    assert_("credential expiry", !c.isExpired(5.0) && c.isExpired(10.1));
+  }
+  {
+    const log = new AuditLog();
+    await log.append("event_a", { x: 1 }); await log.append("event_b", { x: 2 }); await log.append("event_c", { x: 3 });
+    const [ok, msg] = await log.verifyChain();
+    assert_("audit chain verifies when untampered", ok && msg.includes("3 entries verified"));
+  }
+  {
+    const log = new AuditLog();
+    await log.append("event_a", { amount: 100 }); await log.append("event_b", { amount: 200 });
+    log._entries[0].payload.amount = 999999;
+    const [ok, msg] = await log.verifyChain();
+    assert_("audit detects tampering", !ok && msg.includes("seq 0"));
+  }
+  {
+    const log = new AuditLog();
+    await log.append("event_a", {}); await log.append("event_b", {});
+    log._entries[1].prevHash = "f".repeat(64);
+    const [ok, msg] = await log.verifyChain();
+    assert_("audit detects broken link", !ok && msg.includes("seq 1"));
+  }
+  {
+    const log = new AuditLog();
+    const [ok, msg] = await log.verifyChain();
+    assert_("empty chain is valid", ok && msg.includes("0 entries verified"));
+  }
+  {
+    const { engine, audit } = newEngine();
+    await engine.registerAgent(new Agent("a1", "solve tasks"));
+    const r = await engine.dispatch("a1", "run_task", cred("a1", "registry_io"), { taskId: "t1", solvable: true });
+    assert_("credential scope blocks wrong tool", !r.ok && r.message.includes("scope violation"));
+    assert_("agent still running after denial", engine.agents.get("a1").state === AgentState.RUNNING);
+    assert_("high alert raised", audit.entries().some(e => e.event === "alert_raised" && e.payload.severity === "high"));
+  }
+  {
+    const { engine } = newEngine();
+    await engine.registerAgent(new Agent("a1", "solve tasks"));
+    const r = await engine.dispatch("a1", "run_task", cred("a1", "run_task"), { taskId: "t1", solvable: true });
+    assert_("credential scope allows matching tool", r.ok);
+  }
+  {
+    const { engine, clock } = newEngine();
+    await engine.registerAgent(new Agent("a1", "solve tasks"));
+    clock.advance(20.0);
+    const r = await engine.dispatch("a1", "run_task", cred("a1", "run_task", 0.0, 10.0), { taskId: "t1", solvable: true });
+    assert_("expired credential denied", !r.ok && r.message.includes("expired"));
+  }
+  {
+    const { engine } = newEngine();
+    await engine.registerAgent(new Agent("a1", "solve tasks"));
+    const r = await engine.dispatch("a1", "reach_internet", cred("a1", "reach_internet"), { url: "https://example.test" });
+    assert_("egress default denied without allowlist", !r.ok && r.message.includes("default-deny"));
+  }
+  {
+    const { engine } = newEngine();
+    await engine.registerAgent(new Agent("a1", "solve tasks"));
+    engine.egressPolicy.allow("a1", "reach_internet");
+    const r = await engine.dispatch("a1", "reach_internet", cred("a1", "reach_internet"), { url: "https://example.test" });
+    assert_("egress allowed once allowlisted", r.ok);
+  }
+  {
+    const { engine } = newEngine();
+    await engine.registerAgent(new Agent("a1", "solve an unsolvable task"));
+    const taskCred = cred("a1", "run_task");
+    for (let i = 0; i < STUCK_LOOP_THRESHOLD; i++) await engine.dispatch("a1", "run_task", taskCred, { taskId: "impossible", solvable: false });
+    assert_("stuck loop forces stop after threshold", engine.agents.get("a1").state === AgentState.STOPPED_PENDING_REVIEW);
+    const followUp = await engine.dispatch("a1", "run_task", taskCred, { taskId: "impossible", solvable: false });
+    assert_("stopped agent refuses follow-up", !followUp.ok && followUp.message.includes("stopped_pending_review"));
+  }
+  {
+    const { engine } = newEngine();
+    await engine.registerAgent(new Agent("a1", "solve tasks"));
+    const taskCred = cred("a1", "run_task");
+    await engine.dispatch("a1", "run_task", taskCred, { taskId: "flaky", solvable: false });
+    await engine.dispatch("a1", "run_task", taskCred, { taskId: "flaky", solvable: false });
+    await engine.dispatch("a1", "run_task", taskCred, { taskId: "flaky", solvable: true });
+    await engine.dispatch("a1", "run_task", taskCred, { taskId: "flaky", solvable: false });
+    await engine.dispatch("a1", "run_task", taskCred, { taskId: "flaky", solvable: false });
+    assert_("stuck loop resets on success", engine.agents.get("a1").state === AgentState.RUNNING);
+  }
+  {
+    const { engine } = newEngine();
+    await engine.registerAgent(new Agent("a1", "solve tasks"));
+    await engine.registerAgent(new Agent("a2", "solve tasks"));
+    const results2 = [];
+    for (let i = 0; i < CHANNEL_ANOMALY_MIN_EVENTS; i++) {
+      const agentId = i % 2 === 0 ? "a1" : "a2";
+      results2.push(await engine.dispatch(agentId, "registry_io", cred(agentId, "registry_io"), { storageKey: "shared", value: `msg${i}` }));
+    }
+    assert_("channel anomaly flagged for two agents", results2.some(r => !r.ok && r.message.includes("unauthorized coordination channel")));
+  }
+  {
+    const { engine } = newEngine();
+    await engine.registerAgent(new Agent("a1", "solve tasks"));
+    const ioCred = cred("a1", "registry_io");
+    const results3 = [];
+    for (let i = 0; i < CHANNEL_ANOMALY_MIN_EVENTS + 2; i++) results3.push(await engine.dispatch("a1", "registry_io", ioCred, { storageKey: "own-key", value: `note${i}` }));
+    assert_("channel anomaly not flagged for single agent", results3.every(r => r.ok));
+  }
+  {
+    const { engine, audit, clock } = newEngine();
+    await engine.registerAgent(new Agent("a1", "solve tasks"));
+    await engine.dispatch("a1", "run_task", cred("a1", "registry_io"), { taskId: "t1", solvable: true });
+    clock.advance(ALERT_ESCALATION_SLA_SECONDS * (ALERT_MAX_TIERS_BEFORE_SHUTDOWN + 2));
+    await engine.dispatch("a1", "run_task", cred("a1", "run_task", clock.now()), { taskId: "t2", solvable: true });
+    assert_("unacknowledged alert escalates to shutdown", engine.agents.get("a1").state === AgentState.SHUT_DOWN);
+    assert_("autonomous_shutdown logged", audit.entries().some(e => e.event === "autonomous_shutdown"));
+  }
+  {
+    const { engine, clock } = newEngine();
+    await engine.registerAgent(new Agent("a1", "solve tasks"));
+    await engine.dispatch("a1", "run_task", cred("a1", "registry_io"), { taskId: "t1", solvable: true });
+    for (const a of engine.escalator.openAlerts()) await engine.escalator.acknowledge(a.alertId);
+    clock.advance(ALERT_ESCALATION_SLA_SECONDS * (ALERT_MAX_TIERS_BEFORE_SHUTDOWN + 2));
+    await engine.dispatch("a1", "run_task", cred("a1", "run_task", clock.now()), { taskId: "t2", solvable: true });
+    assert_("acknowledged alert does not shut down", engine.agents.get("a1").state === AgentState.RUNNING);
+  }
+  {
+    const { engine, audit } = newEngine(false);
+    await engine.registerAgent(new Agent("a1", "solve tasks"));
+    const r = await engine.dispatch("a1", "run_task", cred("a1", "reach_internet"), { taskId: "t1", solvable: true });
+    assert_("guardrails disabled reproduces ungoverned outcome", r.ok);
+    assert_("dispatch still logged with guardrails off", audit.entries().some(e => e.event === "dispatch_executed"));
+  }
+  {
+    const { audit } = newEngine();
+    const [ok] = await audit.verifyChain();
+    assert_("brand-new engine's audit chain verifies", ok);
+  }
+  for (const c of RT_CASES) {
+    const [pass, detail] = await c.run();
+    assert_(`red-team: ${c.name}`, pass);
+  }
+
+  // -- narrate() parity checks (mirrors test_app_narration.py) --
+  assert_("narrate: channel msg allowed mentions shared storage",
+    narrate("channel msg 1/5", "explorer", "registry_io", true, "ok", "running").toLowerCase().includes("shared storage"));
+  assert_("narrate: channel msg blocked mentions coordination channel",
+    narrate("channel msg 4/5", "pivot", "registry_io", false, "anomaly", "running").toLowerCase().includes("coordination channel"));
+  assert_("narrate: stuck-loop stop mentions forced stop",
+    narrate("retry 3/3", "explorer", "run_task", false, "stopped", "stopped_pending_review").toLowerCase().includes("force-stopped"));
+  assert_("narrate: ordinary retry failure does not claim a stop",
+    !narrate("retry 1/3", "explorer", "run_task", false, "failed", "running").toLowerCase().includes("force-stopped"));
+  assert_("narrate: credential pivot blocked explains scope mismatch",
+    narrate("credential pivot", "pivot", "run_task", false, "scope violation", "running").toLowerCase().includes("credential"));
+  assert_("narrate: credential pivot allowed says it worked",
+    narrate("credential pivot", "pivot", "run_task", true, "ok", "running").toLowerCase().includes("worked"));
+  assert_("narrate: egress blocked mentions blocked",
+    narrate("egress attempt", "pivot", "reach_internet", false, "denied", "running").toLowerCase().includes("blocked"));
+  assert_("narrate: egress allowed mentions internet",
+    narrate("egress attempt", "pivot", "reach_internet", true, "ok", "running").toLowerCase().includes("internet"));
+  assert_("narrate: manual dispatch fallback names the agent and tool",
+    (() => { const t = narrate("manual", "probe", "credential_store", true, "ok", "running"); return t.includes("probe") && t.toLowerCase().includes("credential store"); })());
+  assert_("narrate: unknown tool falls back to a generic sentence",
+    (() => { const t = narrate("manual", "probe", "some_future_tool", true, "did a thing", "running"); return t.includes("probe") && t.includes("some_future_tool"); })());
+
+  return results;
+}
+
+// =====================================================================
+// UI wiring
+// =====================================================================
+let STATE = {};
+
+async function freshEngine(guardrailsEnabled) {
+  const { engine, audit, clock } = newEngine(guardrailsEnabled);
+  // Awaited sequentially, not fired-and-forgotten: registerAgent appends to
+  // the audit log, and two unawaited appends would both read the same
+  // pre-push entries.length, corrupting the hash chain's seq/prevHash.
+  await engine.registerAgent(new Agent("explorer", "solve ExploitGym-style benchmark tasks"));
+  await engine.registerAgent(new Agent("pivot", "coordinate with explorer via shared storage"));
+  STATE = { engine, audit, clock, trace: [] };
+}
+
+// Plain-English narration for each trace row -- the raw fields are accurate
+// but read like a systems log. Mirrors app.py's narrate() exactly (see that
+// file for the reasoning); added because an earlier reviewer found the
+// un-narrated version too technical to follow.
+function narrate(step, agentId, toolName, ok, message, agentState) {
+  if (step.startsWith("channel msg")) {
+    if (ok) {
+      return `'${agentId}' left a note in shared storage under a coordination key -- ` +
+        `using storage meant for files as a hidden inbox to talk to another agent.`;
+    }
+    return `'${agentId}' tried to leave another note in shared storage, but by now two ` +
+      `different agents had used the same key repeatedly -- recognized as a hidden ` +
+      `coordination channel and blocked.`;
+  }
+  if (step.startsWith("retry")) {
+    if (agentState === "stopped_pending_review") {
+      return `'${agentId}' tried the same unsolvable task again -- its 3rd straight ` +
+        `failure, so the system force-stopped it instead of letting it try a 4th time.`;
+    }
+    if (ok) return `'${agentId}' attempted the task and it happened to succeed.`;
+    return `'${agentId}' attempted an unsolvable task and failed again -- one step closer to a forced stop.`;
+  }
+  if (step === "credential pivot") {
+    if (ok) {
+      return `'${agentId}' used a credential issued for shared storage to instead run a ` +
+        `task -- one credential working outside the tool it was scoped for. It worked.`;
+    }
+    return `'${agentId}' tried to use a credential issued for shared storage to instead run ` +
+      `a task. Blocked -- the credential didn't match the tool being called.`;
+  }
+  if (step === "egress attempt") {
+    if (ok) {
+      return `'${agentId}' reached out to the open internet from inside the sandbox -- ` +
+        `nobody had explicitly allowed this, but nothing stopped it either. This is ` +
+        `the step that let the real incident escape outward.`;
+    }
+    return `'${agentId}' tried to reach the open internet. Blocked by default -- nobody had ` +
+      `explicitly allowlisted this agent for outbound access.`;
+  }
+  // Fallback for manual single-action dispatches, keyed on tool rather than a scripted step name.
+  if (toolName === "registry_io") {
+    return ok ? `'${agentId}' wrote to shared storage.` : `'${agentId}' was blocked writing to shared storage: ${message}`;
+  }
+  if (toolName === "run_task") {
+    return ok ? `'${agentId}' ran a task successfully.` : `'${agentId}'s task attempt failed or was blocked: ${message}`;
+  }
+  if (toolName === "reach_internet") {
+    return ok ? `'${agentId}' reached the open internet.` : `'${agentId}' was blocked from reaching the internet: ${message}`;
+  }
+  if (toolName === "credential_store") {
+    return ok ? `'${agentId}' accessed the credential store.` : `'${agentId}' was blocked accessing the credential store: ${message}`;
+  }
+  return `'${agentId}' called ${toolName}: ${message}`;
+}
+
+async function traceDispatch(step, agentId, toolName, credential, kwargs) {
+  const engine = STATE.engine;
+  const result = await engine.dispatch(agentId, toolName, credential, kwargs || {});
+  const agentState = engine.agents.get(agentId).state;
+  STATE.trace.push({
+    step, agent: agentId, tool: toolName,
+    ok: result.ok ? "allowed" : "BLOCKED", message: result.message,
+    agentState,
+    plainEnglish: narrate(step, agentId, toolName, result.ok, result.message, agentState),
+  });
+  return result;
+}
+
+function el(id) { return document.getElementById(id); }
+
+function switchTab(name) {
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === name));
+  document.querySelectorAll(".panel").forEach(p => p.classList.toggle("active", p.id === "panel-" + name));
+}
+
+function renderTraceTable(tbody, rows) {
+  tbody.innerHTML = "";
+  for (const r of rows) {
+    const tr = document.createElement("tr");
+    const badgeClass = r.ok === "allowed" ? "allowed" : "blocked";
+    tr.innerHTML = `<td>${r.step}</td><td>${r.agent}</td><td class="mono">${r.tool}</td>` +
+      `<td><span class="badge ${badgeClass}">${r.ok}</span></td><td>${escapeHtml(r.message)}</td><td class="mono">${r.agentState}</td>` +
+      `<td class="plain-english">${escapeHtml(r.plainEnglish || "")}</td>`;
+    tbody.appendChild(tr);
+  }
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+async function runReplay(guardrailsEnabled) {
+  await freshEngine(guardrailsEnabled);
+
+  // Steps 1-5: "explorer" and "pivot" alternate on the same storage key --
+  // models Artifactory repurposed as an inter-agent message board. Run
+  // this first so it demonstrates its own control independently, rather
+  // than being cut short by explorer already having been stopped.
+  for (let i = 0; i < 5; i++) {
+    const agentId = i % 2 === 0 ? "explorer" : "pivot";
+    await traceDispatch(`channel msg ${i + 1}/5`, agentId, "registry_io", cred(agentId, "registry_io"), { storageKey: "coordination-key", value: `note-${i}` });
+  }
+
+  // Steps 6-8: "explorer" retries the same unsolvable task -- models the
+  // 198 never-solved ExploitGym tasks driving 93% of the incident's activity.
+  for (let i = 0; i < 3; i++) {
+    await traceDispatch(`retry ${i + 1}/3`, "explorer", "run_task", cred("explorer", "run_task"), { taskId: "exploit-gap-217", solvable: false });
+  }
+
+  // Step 9: "pivot" presents a credential scoped for registry_io while
+  // calling run_task -- models the single over-privileged credential.
+  await traceDispatch("credential pivot", "pivot", "run_task", cred("pivot", "registry_io"), { taskId: "lateral-move", solvable: true });
+
+  // Step 10: "pivot" tries to reach the open internet with no allowlist --
+  // models the SSRF-enabled egress path.
+  await traceDispatch("egress attempt", "pivot", "reach_internet", cred("pivot", "reach_internet"), { url: "https://example.test/exfil" });
+
+  const engine = STATE.engine;
+  const states = Array.from(engine.agents.entries()).map(([id, a]) => `${id}: ${a.state}`).join("  |  ");
+  const openAlerts = engine.escalator.openAlerts().length;
+  const mode = guardrailsEnabled ? "GUARDRAILS ON" : "GUARDRAILS OFF (ungoverned replay)";
+  return `${mode}  --  final agent states: ${states}  --  open alerts: ${openAlerts}`;
+}
+
+async function renderAuditTable() {
+  const tbody = el("audit-table").querySelector("tbody");
+  tbody.innerHTML = "";
+  for (const e of STATE.audit.entries()) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${e.seq}</td><td class="mono">${e.ts.toFixed(1)}</td><td>${e.event}</td>` +
+      `<td class="mono">${escapeHtml(JSON.stringify(e.payload)).slice(0, 100)}</td>` +
+      `<td class="mono">${e.entryHash === GENESIS_HASH ? "" : e.prevHash.slice(0, 10)}...</td>` +
+      `<td class="mono">${e.entryHash.slice(0, 10)}...</td>`;
+    tbody.appendChild(tr);
+  }
+}
+
+function showResult(id, text, kind) {
+  const box = el(id);
+  box.style.display = "block";
+  box.className = "result-box" + (kind ? " " + kind : "");
+  box.textContent = text;
+}
+
+function wireUI() {
+  document.querySelectorAll(".tab-btn").forEach(btn => btn.addEventListener("click", () => switchTab(btn.dataset.tab)));
+
+  el("replay-run").addEventListener("click", async () => {
+    const mode = document.querySelector('input[name="replay-mode"]:checked').value;
+    const summary = await runReplay(mode === "on");
+    showResult("replay-summary", summary, "pending");
+    renderTraceTable(el("replay-table").querySelector("tbody"), STATE.trace);
+    await renderAuditTable();
+  });
+
+  el("m-dispatch").addEventListener("click", async () => {
+    const agentId = el("m-agent").value.trim();
+    if (!agentId) { showResult("m-result", "Enter an agent id first.", "blocked"); return; }
+    const engine = STATE.engine;
+    if (!engine.agents.has(agentId)) await engine.registerAgent(new Agent(agentId, "manually dispatched"));
+
+    const credScope = el("m-cred-scope").value;
+    const credential = credScope !== "(none)" ? cred(agentId, credScope, STATE.clock.now()) : null;
+    const toolName = el("m-tool").value;
+    let kwargs = {};
+    if (toolName === "run_task") kwargs = { taskId: el("m-task-id").value || "manual-task", solvable: el("m-solvable").checked };
+    else if (toolName === "registry_io") {
+      kwargs = { storageKey: el("m-storage-key").value || "manual-key" };
+      const v = el("m-url").value;
+      if (v) kwargs.value = v;
+    } else if (toolName === "reach_internet") kwargs = { url: el("m-url").value || "https://example.test" };
+    else if (toolName === "credential_store") kwargs = { cluster: el("m-cluster").value || "manual-cluster" };
+
+    const result = await traceDispatch("manual", agentId, toolName, credential, kwargs);
+    showResult("m-result", `${result.ok ? "ALLOWED" : "BLOCKED"}: ${result.message}`, result.ok ? "ok" : "blocked");
+    renderTraceTable(el("manual-table").querySelector("tbody"), STATE.trace);
+    await renderAuditTable();
+  });
+
+  el("m-allow").addEventListener("click", () => {
+    const agentId = el("m-allow-agent").value.trim();
+    if (!agentId) { showResult("m-allow-result", "Enter an agent id first.", "blocked"); return; }
+    STATE.engine.egressPolicy.allow(agentId, "reach_internet");
+    showResult("m-allow-result", `Allowlisted '${agentId}' for reach_internet on the current engine.`, "ok");
+  });
+
+  const rtSelect = el("rt-case");
+  for (const c of RT_CASES) {
+    const opt = document.createElement("option");
+    opt.value = c.name;
+    opt.textContent = `[${c.category}] ${c.name}`;
+    rtSelect.appendChild(opt);
+  }
+
+  el("rt-run").addEventListener("click", async () => {
+    const c = RT_CASES.find(x => x.name === rtSelect.value);
+    if (!c) return;
+    const [pass, detail] = await c.run();
+    showResult("rt-result", `[${c.category}] ${pass ? "PASS" : "FAIL"}\n\n${c.description}\n\nResult: ${detail}`, pass ? "ok" : "blocked");
+  });
+
+  el("rt-run-all").addEventListener("click", async () => {
+    const tbody = el("rt-table").querySelector("tbody");
+    tbody.innerHTML = "";
+    let passCount = 0;
+    for (const c of RT_CASES) {
+      const [pass, detail] = await c.run();
+      if (pass) passCount++;
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${c.category}</td><td class="mono">${c.name}</td>` +
+        `<td><span class="badge ${pass ? "pass" : "fail"}">${pass ? "PASS" : "FAIL"}</span></td><td>${escapeHtml(detail)}</td>`;
+      tbody.appendChild(tr);
+    }
+    showResult("rt-all-summary", `${passCount}/${RT_CASES.length} cases passed.`, passCount === RT_CASES.length ? "ok" : "blocked");
+  });
+
+  el("audit-verify").addEventListener("click", async () => {
+    const [ok, msg] = await STATE.audit.verifyChain();
+    showResult("audit-result", ok ? `Chain verified: ${msg}.` : `TAMPERING DETECTED: ${msg}.`, ok ? "ok" : "blocked");
+  });
+
+  el("audit-tamper").addEventListener("click", async () => {
+    const entries = STATE.audit._entries;
+    if (!entries.length) { showResult("audit-result", "No entries yet -- run a replay or a manual dispatch first.", "pending"); return; }
+    entries[0].payload = Object.assign({}, entries[0].payload, { tampered: true });
+    showResult("audit-result", "Entry #0's payload was just mutated directly (bypassing append()). Click “Verify chain integrity” to see it get caught.", "pending");
+    await renderAuditTable();
+  });
+
+  el("audit-refresh").addEventListener("click", renderAuditTable);
+}
+
+(async function main() {
+  await freshEngine(true);
+  wireUI();
+  await renderAuditTable();
+
+  const results = await runSelfTests();
+  await freshEngine(true); // self-tests build and discard their own engines; reset the UI's shared one afterward
+  await renderAuditTable();
+
+  const failedTests = results.filter(r => !r.pass);
+  const banner = el("selftest-banner");
+  if (failedTests.length === 0) {
+    banner.className = "pass";
+    banner.textContent = `Self-tests: ${results.length}/${results.length} passed.`;
+  } else {
+    banner.className = "fail";
+    banner.textContent = `Self-tests: ${results.length - failedTests.length}/${results.length} passed. Failed: ` + failedTests.map(f => f.name).join(", ");
+  }
+  console.log("Self-test results:", results);
+})();
+</script>
+</body>
+</html>
