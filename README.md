@@ -11,4 +11,4 @@ Coursework projects from Nitin Parab's MSc in AI and Innovation at the National 
 Each project folder is self-contained with its own README covering the problem, approach, results, and how to run it.
 
 ---
-See also: standalone repos for ongoing work in [RAG](#), [LLM](#), and [Agentic AI](#) *(links added as those repos are created)*.
+See also: independent AI governance projects, each in its own repo: [EU AI Act Risk Navigator](https://github.com/nitinparab4cloud/ai-act-risk-navigator) · [Algorithmic Fairness Auditor](https://github.com/nitinparab4cloud/fairness-auditor) · [Governance Documentation Suite](https://github.com/nitinparab4cloud/governance-documentation-suite) · [Explainability Auditor](https://github.com/nitinparab4cloud/explainability-auditor) · [Governed RAG Agent](https://github.com/nitinparab4cloud/governed-rag-agent) · [Agentic AI Incident Response](https://github.com/nitinparab4cloud/agentic-incident-response)
