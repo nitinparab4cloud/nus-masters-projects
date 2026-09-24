@@ -15,7 +15,7 @@ This analysis successfully demonstrates that machine learning models can predict
 
 - **Best Model:** XGBoost with TF-IDF features
 - **Performance:** 99.33% F1-score, 99.75% AUC-ROC
-- **Dataset Size:** 8,167 cases (6,534 train, 1,633 test)
+- **Dataset Size:** 8,166 cases after dropping 1 incomplete record (6,532 train, 1,634 test)
 - **Class Distribution:** 83% guilty, 17% not guilty
 - **Feature Space:** 10,000 TF-IDF features (unigrams + bigrams)
 - **Training Time:** ~2.7 minutes for best model
@@ -56,7 +56,7 @@ This question addresses fundamental concerns in legal AI:
    - Dropped rows with missing critical values
 
 3. **Train-Test Split**
-   - 80% training (6,534 cases), 20% testing (1,633 cases)
+   - 80% training (6,532 cases), 20% testing (1,634 cases)
    - Stratified split to maintain 83/17 class distribution
    - Random state: 42 (reproducible)
 
@@ -142,7 +142,7 @@ This question addresses fundamental concerns in legal AI:
 
 **XGBoost (TF-IDF Features) - Best Overall Model**
 
-**Confusion Matrix (Test Set, n=1,633):**
+**Confusion Matrix (Test Set, n=1,634):**
 ```
                     Predicted
                     Not Guilty  Guilty
@@ -155,7 +155,7 @@ Actual Not Guilty      271        7
 - True Negatives: 271 (correctly predicted not guilty)
 - False Positives: 7 (predicted guilty, actually not guilty)
 - False Negatives: 11 (predicted not guilty, actually guilty)
-- Error Rate: 1.10% (18 errors out of 1,633 cases)
+- Error Rate: 1.10% (18 errors out of 1,634 cases)
 
 **Cross-Validation Performance:**
 - Mean CV F1-score: 99.15%
@@ -281,7 +281,7 @@ Actual Not Guilty      271        7
 
 ### 5.3 Error Rate Context
 
-**Overall Error Rate: 1.10% (18 errors / 1,633 cases)**
+**Overall Error Rate: 1.10% (18 errors / 1,634 cases)**
 
 **Comparison to Human Performance:**
 - Historical appeal rates: ~5-10% of criminal convictions
@@ -557,7 +557,7 @@ Use Logistic Regression (97.73% F1) for production legal AI where explainability
    - Final model retrained on full training set with best params
 
 4. **Test Set Never Touched**
-   - Test set (1,633 cases) held out completely
+   - Test set (1,634 cases) held out completely
    - Only used for final evaluation
    - Prevents overfitting to test distribution
 

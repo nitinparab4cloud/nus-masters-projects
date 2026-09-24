@@ -276,7 +276,7 @@ print("=" * 80)
 print("\n📊 MODEL PERFORMANCE:")
 print("   • Logistic Regression (this demo): F1 ~97-98%")
 print("   • XGBoost (full RQ1 analysis):     F1 = 99.33%, AUC = 99.75%")
-print("   • Error rate (XGBoost):             1.1% (18 errors / 1,633 test cases)")
+print("   • Error rate (XGBoost):             1.1% (18 errors / 1,634 test cases)")
 print("   • Both models: Text length is strongest predictor")
 
 print("\n🔑 KEY FINDINGS:")

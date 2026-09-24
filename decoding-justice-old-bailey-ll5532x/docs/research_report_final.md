@@ -153,7 +153,7 @@ For RQ3, 15+ punishment subcategories were consolidated into four groups:
 
 | Research Question | Sample Size | Split | Target |
 |---|---|---|---|
-| RQ1: Verdict Prediction | 8,167 trials | 6,534 / 1,633 (80/20) | Binary: guilty vs not guilty |
+| RQ1: Verdict Prediction | 8,166 trials | 6,532 / 1,634 (80/20) | Binary: guilty vs not guilty |
 | RQ2: Gender Bias | 6,945 guilty trials | 5,556 / 1,389 (80/20) | Binary: harsh vs lenient |
 | RQ3: Punishment Prediction | 6,945 guilty cases | 4,861 / 2,084 (70/30) | 4-class: punishment type |
 
